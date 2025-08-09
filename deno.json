@@ -1,0 +1,9 @@
+{
+  "name": "@aiwas/markdown-it-aozora",
+  "version": "0.1.0",
+  "exports": "./mod.ts",
+  "imports": {
+    "markdown-it": "https://esm.sh/markdown-it@14.1.0",
+    "@types/markdown-it": "https://esm.sh/@types/markdown-it@14.1.1"
+  }
+}
