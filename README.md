@@ -21,7 +21,7 @@ deno add jsr:@aiwas/markdown-it-aozora-ruby
 
 ```ts
 import MarkdownIt from "markdown-it";
-import aozoraRubyPlugin from "markdown-it-aozora-ruby";
+import aozoraRubyPlugin from "@aiwas/markdown-it-aozora-ruby";
 
 const md = new MarkdownIt().use(aozoraRubyPlugin);
 
