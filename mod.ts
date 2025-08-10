@@ -1,15 +1,19 @@
-import type MarkdownIt from "markdown-it";
-import type { StateCore, Token } from "markdown-it";
+import type { default as MarkdownIt, PluginSimple } from "markdown-it";
+
+type ElementType<T> = T extends (infer U)[] ? U : never;
+type RuleCore = Parameters<MarkdownIt["core"]["ruler"]["after"]>[2];
+type Token = ElementType<ReturnType<MarkdownIt["parse"]>>;
 
 /**
  * A markdown-it plugin for Aozora Bunko style ruby syntax.
  *
  * This plugin uses a core ruler to scan for ruby syntax after inline parsing.
  * It supports:
- * - 漢字《かんじ》
- * - ｜言葉《ことば》
+ * - 文中の漢字《かんじ》に対するルビ
+ * - 明示的に区切った｜文の一部《フレーズ》に対するルビ
+ * @param md an instance of MarkdownIt
  */
-export default function aozoraRubyPlugin(md: MarkdownIt) {
+const aozoraRubyPlugin: PluginSimple = (md) => {
   md.core.ruler.after("inline", "aozora_ruby_core", aozoraRubyCore);
 
   md.renderer.rules.ruby_open = () => "<ruby>";
@@ -18,9 +22,9 @@ export default function aozoraRubyPlugin(md: MarkdownIt) {
   md.renderer.rules.rt_close = () => "</rt>";
   md.renderer.rules.rp_open = () => "<rp>";
   md.renderer.rules.rp_close = () => "</rp>";
-}
+};
 
-function aozoraRubyCore(state: StateCore) {
+const aozoraRubyCore: RuleCore = (state) => {
   for (const inlineToken of state.tokens) {
     if (inlineToken.type !== "inline" || !inlineToken.children) {
       continue;
@@ -107,5 +111,6 @@ function aozoraRubyCore(state: StateCore) {
       inlineToken.children = newChildren;
     }
   }
-}
+};
 
+export default aozoraRubyPlugin;

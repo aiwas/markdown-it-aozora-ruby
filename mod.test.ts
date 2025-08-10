@@ -1,48 +1,66 @@
-import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
+import { assertEquals } from "@std/assert";
+import { describe, it } from "@std/testing/bdd";
 import MarkdownIt from "markdown-it";
 import aozoraRubyPlugin from "./mod.ts";
 
-Deno.test("Aozora Ruby Plugin", async (t) => {
+describe("Markdown Aozora Plugin", () => {
   const md = new MarkdownIt().use(aozoraRubyPlugin);
 
-  await t.step("should render basic ruby for Kanji", () => {
-    const text = "これは漢字《かんじ》です。";
+  it("should render basic ruby for kanji", () => {
+    const text = "この漢字《かんじ》にルビを振る。";
     const expected =
-      "<p>これは<ruby>漢字<rp>（</rp><rt>かんじ</rt><rp>）</rp></ruby>です。</p>\n";
+      "<p>この<ruby>漢字<rp>（</rp><rt>かんじ</rt><rp>）</rp></ruby>にルビを振る。</p>\n";
     const result = md.render(text);
     assertEquals(result, expected);
   });
 
-  await t.step("should render ruby with '｜' for longer text", () => {
-    const text = "これは｜長い言葉《ながいことば》です。";
+  it("should render ruby for special characters treated as kanji", () => {
+    const text = "注意として々仝〆〇ヶ《これら》は漢字と見なす。";
     const expected =
-      "<p>これは<ruby>長い言葉<rp>（</rp><rt>ながいことば</rt><rp>）</rp></ruby>です。</p>\n";
+      "<p>注意として<ruby>々仝〆〇ヶ<rp>（</rp><rt>これら</rt><rp>）</rp></ruby>は漢字と見なす。</p>\n";
     const result = md.render(text);
     assertEquals(result, expected);
   });
 
-  await t.step("should not render ruby when base text is not valid", () => {
-    const text = "これは 《かんじ》です。"; // Space before '《'
-    const expected = "<p>これは 《かんじ》です。</p>\n";
+  it("should render ruby for parts of the sentence separated by '｜'", () => {
+    const text = "この場合は｜区切り文字《セパレータ》を使う。";
+    const expected =
+      "<p>この場合は<ruby>区切り文字<rp>（</rp><rt>セパレータ</rt><rp>）</rp></ruby>を使う。</p>\n";
     const result = md.render(text);
     assertEquals(result, expected);
   });
 
-  await t.step("should not render ruby for non-kanji base text without '｜'", () => {
-    const text = "abc《alphabet》";
-    const expected = "<p>abc《alphabet》</p>\n";
+  it("should render ruby by separating parts of consecutive kanji characters with '｜'", () => {
+    const text = "開いたままの本は一｜頁《ページ》も進んでいない。";
+    const expected =
+      "<p>開いたままの本は一<ruby>頁<rp>（</rp><rt>ページ</rt><rp>）</rp></ruby>も進んでいない。</p>\n";
     const result = md.render(text);
     assertEquals(result, expected);
   });
 
-  await t.step("should render ruby for non-kanji base text with '｜'", () => {
-    const text = "｜abc《alphabet》";
-    const expected = "<p><ruby>abc<rp>（</rp><rt>alphabet</rt><rp>）</rp></ruby></p>\n";
+  it("should not render ruby when the preceding text is separated by space", () => {
+    const text = "この漢字 《かんじ》にルビを振る。"; // Space before '《'
+    const expected = "<p>この漢字 《かんじ》にルビを振る。</p>\n";
     const result = md.render(text);
     assertEquals(result, expected);
   });
 
-  await t.step("should handle multiple ruby tags in one line", () => {
+  it("should not render ruby for non-kanji text without '｜'", () => {
+    const text = "Markdown《マークダウン》形式は便利だ。";
+    const expected = "<p>Markdown《マークダウン》形式は便利だ。</p>\n";
+    const result = md.render(text);
+    assertEquals(result, expected);
+  });
+
+  it("should render ruby for non-kanji text with '｜'", () => {
+    const text = "｜Markdown《マークダウン》形式は便利だ。";
+    const expected =
+      "<p><ruby>Markdown<rp>（</rp><rt>マークダウン</rt><rp>）</rp></ruby>形式は便利だ。</p>\n";
+    const result = md.render(text);
+    assertEquals(result, expected);
+  });
+
+  it("should handle multiple ruby in one line", () => {
     const text = "｜今日《きょう》は｜天気《てんき》がいい。";
     const expected =
       "<p><ruby>今日<rp>（</rp><rt>きょう</rt><rp>）</rp></ruby>は<ruby>天気<rp>（</rp><rt>てんき</rt><rp>）</rp></ruby>がいい。</p>\n";
@@ -50,7 +68,7 @@ Deno.test("Aozora Ruby Plugin", async (t) => {
     assertEquals(result, expected);
   });
 
-  await t.step("should handle mixed ruby tags", () => {
+  it("should handle mixed ruby", () => {
     const text = "｜今日《きょう》は天気《てんき》がいい。";
     const expected =
       "<p><ruby>今日<rp>（</rp><rt>きょう</rt><rp>）</rp></ruby>は<ruby>天気<rp>（</rp><rt>てんき</rt><rp>）</rp></ruby>がいい。</p>\n";
@@ -58,15 +76,14 @@ Deno.test("Aozora Ruby Plugin", async (t) => {
     assertEquals(result, expected);
   });
 
-  await t.step("should handle plain text without ruby", () => {
-    const text = "This is a plain text without any ruby syntax.";
-    const expected =
-      "<p>This is a plain text without any ruby syntax.</p>\n";
+  it("should handle plain text without ruby", () => {
+    const text = "今日は天気がいい。";
+    const expected = "<p>今日は天気がいい。</p>\n";
     const result = md.render(text);
     assertEquals(result, expected);
   });
 
-  await t.step("should work with other markdown syntax", () => {
+  it("should work with other markdown syntax", () => {
     const text = "これは**強調**と｜ルビ《るび》のテスト。";
     const expected =
       "<p>これは<strong>強調</strong>と<ruby>ルビ<rp>（</rp><rt>るび</rt><rp>）</rp></ruby>のテスト。</p>\n";

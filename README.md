@@ -1,23 +1,20 @@
-# markdown-it-aozora
+# markdown-it-aozora-ruby
 
 [![JSR](https://jsr.io/badges/@aiwas/markdown-it-aozora)](https://jsr.io/badges/@aiwas/markdown-it-aozora)
 
-A [markdown-it](https://github.com/markdown-it/markdown-it) plugin to support Aozora Bunko style ruby syntax.
-
-This plugin is built for Deno and is intended to be published on JSR.
+A [markdown-it](https://github.com/markdown-it/markdown-it) plugin to support
+Aozora Bunko style ruby syntax.
 
 ## Features
 
-- Parses Aozora Bunko style ruby (furigana) like below:
+- Parses Aozora Bunko style ruby like below:
   - `耳まで火照《ほて》って`
   - `武州｜青梅《おうめ》の宿`
 
 ## Installation
 
-### Deno
-
 ```sh
-deno add jsr:@aiwas/markdown-it-aozora
+deno add jsr:@aiwas/markdown-it-aozora-ruby
 ```
 
 ## Usage
@@ -28,22 +25,32 @@ import aozoraRubyPlugin from "markdown-it-aozora";
 
 const md = new MarkdownIt().use(aozoraRubyPlugin);
 
-const markdownText = `
-これは｜青空文庫《あおぞらぶんこ》のルビ記法を再現するプラグインです。
-漢字《かんじ》にも対応しています。
-`;
-
-const html = md.render(markdownText);
+const html = md.render(
+  "これは青空文庫《あおぞらぶんこ》のルビ記法を使用するためのプラグインです。",
+);
 
 console.log(html);
 ```
 
 **Output:**
 
+<!-- deno-fmt-ignore-start -->
+
 ```html
-<p>これは<ruby>青空文庫<rp>（</rp><rt>あおぞらぶんこ</rt><rp>）</rp></ruby>のルビ記法を再現するプラグインです。
-<ruby>漢字<rp>（</rp><rt>かんじ</rt><rp>）</rp></ruby>にも対応しています。</p>
+<p>これは<ruby>青空文庫<rp>（</rp><rt>あおぞらぶんこ</rt><rp>）</rp></ruby>のルビ記法を使用するためのプラグインです。</p>
 ```
+
+<!-- deno-fmt-ignore-end -->
+
+## Disclaimer
+
+Currently, this plugin does **NOT** strictly support Aozora Bunko notation.\
+Aozora Bunko displays ruby characters for alphabets separated by spaces, but in
+this plugin, characters other than kanji must always be separated by the "｜"
+symbol.\
+For example, no ruby will be rendered for
+`この Markdown《マークダウン》 形式は便利だ。` (that has space before an
+alphabet word and after the '》' symbol, Aozora Bunko's intended format).
 
 ## References
 
