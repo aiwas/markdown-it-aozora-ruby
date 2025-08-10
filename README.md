@@ -1,6 +1,6 @@
 # markdown-it-aozora-ruby
 
-[![JSR](https://jsr.io/badges/@aiwas/markdown-it-aozora)](https://jsr.io/badges/@aiwas/markdown-it-aozora)
+[![JSR](https://jsr.io/badges/@aiwas/markdown-it-aozora-ruby)](https://jsr.io/badges/@aiwas/markdown-it-aozora-ruby)
 
 A [markdown-it](https://github.com/markdown-it/markdown-it) plugin to support
 Aozora Bunko style ruby syntax.
@@ -21,7 +21,7 @@ deno add jsr:@aiwas/markdown-it-aozora-ruby
 
 ```ts
 import MarkdownIt from "markdown-it";
-import aozoraRubyPlugin from "markdown-it-aozora";
+import aozoraRubyPlugin from "markdown-it-aozora-ruby";
 
 const md = new MarkdownIt().use(aozoraRubyPlugin);
 
