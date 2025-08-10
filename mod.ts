@@ -1,9 +1,5 @@
 import type { default as MarkdownIt, PluginSimple } from "markdown-it";
 
-type ElementType<T> = T extends (infer U)[] ? U : never;
-type RuleCore = Parameters<MarkdownIt["core"]["ruler"]["after"]>[2];
-type Token = ElementType<ReturnType<MarkdownIt["parse"]>>;
-
 /**
  * A markdown-it plugin for Aozora Bunko style ruby syntax.
  *
@@ -24,14 +20,16 @@ const aozoraRubyPlugin: PluginSimple = (md) => {
   md.renderer.rules.rp_close = () => "</rp>";
 };
 
-const aozoraRubyCore: RuleCore = (state) => {
+const aozoraRubyCore: Parameters<MarkdownIt["core"]["ruler"]["after"]>[2] = (
+  state,
+) => {
   for (const inlineToken of state.tokens) {
     if (inlineToken.type !== "inline" || !inlineToken.children) {
       continue;
     }
 
     const children = inlineToken.children;
-    const newChildren: Token[] = [];
+    const newChildren: typeof state.tokens = [];
     let modified = false;
 
     for (const child of children) {
@@ -63,7 +61,9 @@ const aozoraRubyCore: RuleCore = (state) => {
         const baseText = pipeBase || kanjiBase;
         const rubyText = pipeRuby || kanjiRuby;
 
-        if (!baseText || !rubyText) continue;
+        if (!baseText || !rubyText) {
+          continue;
+        }
 
         const matchIndex = match.index;
 
